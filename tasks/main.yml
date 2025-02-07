@@ -1,32 +1,58 @@
+- name: Install unzip if on a dedicated server (shared servers are assumed to have this command)
+  ansible.builtin.package:
+    name: unzip
+  when: not vaultwarden_shared_server
+    
 - name: Make sure we have a directory to store Vaultwarden's data
   ansible.builtin.file:
-    path: files/vaultwarden/data
+    path: "{{ 'files/vaultwarden/data' if vaultwarden_shared_server else '/usr/local/vaultwarden/data'}}"
     state: directory
-    mode: 700
-
+    mode: '700'
+      
+- name: Make sure we have a directory to store Vaultwarden's environment variables
+  ansible.builtin.file:
+    path: "{{ '.config' if vaultwarden_shared_server else '/etc/vaultwarden'}}"
+    state: directory
+    mode: '700'
+        
 - name: Downloading binary release file from github
   ansible.builtin.unarchive:
     src: https://github.com/czyt/vaultwarden-binary/releases/download/{{vaultwarden_version}}-extracted/vaultwarden-linux-{{vaultwarden_arch}}-extracted.zip
-    dest: files
+    dest: "{{ 'files' if vaultwarden_shared_server else '/usr/local/vaultwarden'}}"
     remote_src: true
-    creates: files/vaultwarden
+    creates: "{{ 'files/vaultwarden' if vaultwarden_shared_server else '/usr/local/vaultwarden/vaultwarden'}}"
 
 - name: Configuring vaultwarden's environment variables
   ansible.builtin.template:
     src: templates/vaultwarden.env.j2
-    dest: .config/vaultwarden.env
+    dest: "{{ '.config/vaultwarden.env' if vaultwarden_shared_server else '/etc/vaultwarden/vaultwarden.env'}}"
     mode: '600'
+
+- name: Adding systemd service to run vaultwarden if on a dedicated server
+  ansible.builtin.template:
+    src: templates/vaultwarden.service.j2
+    dest: /etc/systemd/system/vaultwarden.service
+  when: not vaultwarden_shared_server
+
+- name: Activate systemd service if on a dedicated server
+  ansible.builtin.systemd_service:
+    state: restarted
+    enabled: true
+    daemon_reload: true
+    name: vaultwarden
 
 # MayFirst requires environment variables to be quoted in a non-standard way so
 # we print out the string in the format they require so it can be easily copied
 # and pasted into their control panel.
-- name: Setting up administrator account, if the information was provided
+- name: Generating the string of environment variables that will be entered into MayFirst's scheduled job
   ansible.builtin.shell:
     cmd: |
-      sed -e "s/\(.*\)'\(.*\)'/'\1\2'/g" -e 's/\(.*\)"\(.*\)"/"\1\2"/g' < .config/vaultwarden.env | awk '{ printf "%s ", $0 }
+      sed -e "s/\(.*\)'\(.*\)'/'\1\2'/g" -e 's/\(.*\)"\(.*\)"/"\1\2"/g' < .config/vaultwarden.env | awk '{ printf "%s ", $0 }'
   register: env_var_string
+  when: vaultwarden_shared_server
 
+# https://help.mayfirst.org/en/guide/how-to-use-a-systemd-service-to-run-web-app
 - name: Printing out the environment variables to enter into MayFirst's scheduled job
   ansible.builtin.debug:
-    msg: env_var_string.stdout
-# https://help.mayfirst.org/en/guide/how-to-use-a-systemd-service-to-run-web-app
+    msg: "{{env_var_string.stdout}}"
+  when: vaultwarden_shared_server

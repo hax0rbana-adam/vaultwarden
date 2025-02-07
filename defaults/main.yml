@@ -9,7 +9,12 @@
 #vaultwarden_smtp_username:
 #vaultwarden_smtp_password:
 
-#vaultwarden_database_url: postgresql://vaultwarden:hunter2@psql002.mayfirst.cx/vaultwarden
+vaultwarden_database_username: postgres
+#vaultwarden_database_password: 
+vaultwarden_database_name: vaultwarden
+vaultwarden_database_server: psql002.mayfirst.cx
+
+vaultwarden_shared_server: true
 
 # Defaults
 vaultwarden_signups_allows: false
@@ -23,6 +28,7 @@ vaultwarden_smtp_host: mail.mayfirst.org
 vaultwarden_smtp_port: 465
 vaultwarden_smtp_security: force_tls
 vaultwarden_smtp_from_name: Vaultwarden {{ansible_fqdn}}
+vaultwarden_database_url: postgresql://{{vaultwarden_database_username}}:{{vaultwarden_database_password}}@{{vaultwarden_database_server}}/{{vaultwarden_database_name}}
 
 # Check for the latest binary release here:
 # https://github.com/czyt/vaultwarden-binary/releases
