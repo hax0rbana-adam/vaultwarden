@@ -1,0 +1,32 @@
+# The `./vaultwarden hash` reads from a tty and can not be scripted without
+# something like `expect`, which we don't want to require to be installed
+# since this is something that will be run on a shared host. Thus, the role
+# takes the argon2id hash, which can be generated with something like:
+# https://argon2.online/
+
+#vaultwarden_admin_hash: "$argon2id$v=19$m=65540,t=3,p=4$hpiewbOU3H/iY6WvPoQJCvx9CY7DFmXvUWm9T9b3Z3k$tUhBc7/ucfquUJtUy43iXvceqZtdASGqPHNDEbHkflQ"
+
+#vaultwarden_smtp_username:
+#vaultwarden_smtp_password:
+
+#vaultwarden_database_url: postgresql://vaultwarden:hunter2@psql002.mayfirst.cx/vaultwarden
+
+# Defaults
+vaultwarden_signups_allows: false
+vaultwarden_websocket_enabled: true
+vaultwarden_rocket_address: 127.0.0.1
+vaultwarden_rocket_port: 8000
+vaultwarden_websocket_address: 127.0.0.1
+vaultwarden_domain: "https://{{ansible_fqdn}}"
+vaultwarden_smtp_from: NOREPLY@{{ansible_domain}}
+vaultwarden_smtp_host: mail.mayfirst.org
+vaultwarden_smtp_port: 465
+vaultwarden_smtp_security: force_tls
+vaultwarden_smtp_from_name: Vaultwarden {{ansible_fqdn}}
+
+# Check for the latest binary release here:
+# https://github.com/czyt/vaultwarden-binary/releases
+# The main repo (https://github.com/dani-garcia/vaultwarden) doesn't release
+# binaries, only source code, which is why we turn to czyt.
+vaultwarden_version: 1.32.7
+vaultwarden_arch: amd64
