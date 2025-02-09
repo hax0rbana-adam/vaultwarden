@@ -9,7 +9,7 @@
 #vaultwarden_smtp_username:
 #vaultwarden_smtp_password:
 
-vaultwarden_database_username: postgres
+vaultwarden_database_username: vaultwarden
 #vaultwarden_database_password: 
 vaultwarden_database_name: vaultwarden
 vaultwarden_database_server: psql002.mayfirst.cx

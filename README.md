@@ -66,7 +66,6 @@ Here's a sample playbook for a standalone server:
     vaultwarden_smtp_username: bilbo
     vaultwarden_smtp_password: hunter2
     vaultwarden_database_password: hunter3
-    vaultwarden_database_name: vaultwarden
     vaultwarden_database_server: localhost
   roles:
     # ansible-galaxy role install ANXS.postgresql,v1.16.0
@@ -79,17 +78,68 @@ Here's a sample playbook for a standalone server:
       postgresql_database_schemas:
         - database: "{{vaultwarden_database_name}}"
           schema: "public"
-          state: present
+          owner: "{{vaultwarden_database_username}}"
       postgresql_user_privileges:
         - name: "{{vaultwarden_database_username}}"
           db: "{{vaultwarden_database_name}}"
           priv: "ALL"
       postgresql_apt_dependencies: ["python3-psycopg2", "locales"]
     - hax0rbana-adam.vaultwarden
-    # You'll also need to get TLS certificates and set up nginx/apache/haproxy
-    #- nginxinc.nginx
-    #- nginxinc.nginx_config
+    # ansible-galaxy role install nginxinc.nginx nginxinc.nginx_config
+    - nginxinc.nginx
+    # ansible-galaxy role install geerlingguy.certbot
+    - role: geerlingguy.certbot
+      certbot_create_if_missing: true
+      certbot_certs:
+        - email: webmaster@{{ansible_domain}}
+          domains: [ "{{ansible_fqdn}}" ]
+    - role: nginxinc.nginx_config
+      nginx_config_http_template_enable: true
+      nginx_config_http_template:
+        - backup: false
+          config:
+            ssl:
+              certificate: "/etc/letsencrypt/live/{{ansible_fqdn}}/fullchain.pem"
+              certificate_key: "/etc/letsencrypt/live/{{ansible_fqdn}}/privkey.pem"
+            servers:
+              - core:
+                  listen:
+                    - address: 0.0.0.0
+                      port: 80
+                      default_server: true
+                      ssl: false
+                rewrite:
+                  return:
+                    code: 301
+                    text: 'https://$host$request_uri'
+              - core:
+                  server_name: "{{inventory_hostname}}"
+                  listen:
+                    - address: 0.0.0.0
+                      port: 443
+                      default_server: true
+                      ssl: true
+                locations:
+                  - location: '~ /\.ht'
+                    access:
+                      deny: all
+                  - location: /
+                    proxy:
+                      pass: http://localhost:8000
+                      set_header:
+                        - field: Host
+                          value: '$http_host'
+                        - field: X-Real-IP
+                          value: '$remote_addr'
+                        - field: X-WEBAUTH-USER
+                          value: '$remote_user'
+                        - field: Authorization
+                          value: '""'
 ```
+
+In a situation which isn't a demo, your variables would be defined in something
+like host_vars or group_vars. They're just listed in the playbook to give a
+complete example.
 
 If you don't already have an existing inventory file, running the playbook will
 look something like this:
