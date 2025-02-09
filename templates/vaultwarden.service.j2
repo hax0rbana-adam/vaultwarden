@@ -1,0 +1,23 @@
+[Unit]
+Description=Vaultwarden Server (Rust Edition)
+Documentation=https://github.com/dani-garcia/vaultwarden
+After=network.target
+    
+[Service]
+# The user/group vaultwarden is run under. the working directory (see below) should allow write and read access to this user/group
+# The location of the .env file for configuration
+EnvironmentFile=/etc/vaultwarden/vaultwarden.env
+# The location of the compiled binary
+ExecStart=/usr/local/vaultwarden/vaultwarden
+# Set reasonable connection and process limits
+LimitNOFILE=1048576
+LimitNPROC=64
+# Isolate vaultwarden from the rest of the system
+ProtectHome=true
+ProtectSystem=strict
+# Only allow writes to the following directory and set it to the working directory (user and password data are stored here)
+WorkingDirectory=/usr/local/vaultwarden
+ReadWriteDirectories=/usr/local/vaultwarden
+
+[Install]
+WantedBy=multi-user.target
