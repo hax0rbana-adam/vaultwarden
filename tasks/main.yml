@@ -2,19 +2,19 @@
   ansible.builtin.package:
     name: unzip
   when: not vaultwarden_shared_server
-    
+
 - name: Make sure we have a directory to store Vaultwarden's data
   ansible.builtin.file:
     path: "{{ 'files/vaultwarden/data' if vaultwarden_shared_server else '/usr/local/vaultwarden/data'}}"
     state: directory
     mode: '700'
-      
+
 - name: Make sure we have a directory to store Vaultwarden's environment variables
   ansible.builtin.file:
     path: "{{ '.config' if vaultwarden_shared_server else '/etc/vaultwarden'}}"
     state: directory
     mode: '700'
-        
+
 - name: Downloading binary release file from github
   ansible.builtin.unarchive:
     src: https://github.com/czyt/vaultwarden-binary/releases/download/{{vaultwarden_version}}-extracted/vaultwarden-linux-{{vaultwarden_arch}}-extracted.zip
