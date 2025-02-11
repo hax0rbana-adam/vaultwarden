@@ -42,7 +42,31 @@ Here's an example playbook to set up Vaultwarden on a shared server.
     - hax0rbana-adam.vaultwarden
 ```
 
-Running the playbook will look something like this:
+There are also some options required in your `ansible.cfg` file:
+
+```ini
+[defaults]
+# Found via the error message if you don't have this in here
+remote_tmp=$HOME/.ansible/tmp
+
+# Use pipelining to work around this bug:
+# https://github.com/ansible/ansible/issues/57542
+# found via this forum post
+# https://forum.ansible.com/t/ansible-2-9-failed-to-transfer-ansiballz-setup-py-when-gathering-facts/34253
+pipelining=True
+
+# Use stdout_callback of "debug" to avoid escaped quotes in debug messages
+# found via https://stackoverflow.com/a/54943100
+stdout_callback=debug
+
+[ssh_connection]
+# Found via the warning messages if you don't have this in here
+# Use SCP only (as opposed to using SFTP)
+transfer_method=scp
+scp_if_ssh = true
+```
+
+And then running the playbook will look something like this:
 
 ```sh
 ansible-playbook -ishell.mayfirst.org, vaultwarden.yml
