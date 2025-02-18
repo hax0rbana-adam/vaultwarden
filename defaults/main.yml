@@ -34,5 +34,5 @@ vaultwarden_database_url: postgresql://{{vaultwarden_database_username}}:{{vault
 # https://github.com/czyt/vaultwarden-binary/releases
 # The main repo (https://github.com/dani-garcia/vaultwarden) doesn't release
 # binaries, only source code, which is why we turn to czyt.
-vaultwarden_version: 1.32.7
+vaultwarden_version: 1.33.2
 vaultwarden_arch: amd64
