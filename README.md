@@ -45,7 +45,9 @@ Here's an example playbook to set up Vaultwarden on a shared server.
     vaultwarden_admin_hash: '$argon2id$v=19$m=65540,t=3,p=4$hpiewbOU3H/iY6WvPoQJCvx9CY7DFmXvUWm9T9b3Z3k$tUhBc7/ucfquUJtUy43iXvceqZtdASGqPHNDEbHkflQ'
     vaultwarden_smtp_username: bilbo
     vaultwarden_smtp_password: hunter2
-    vaultwarden_database_url: postgresql://vaultwarden:hunter2@psql002.mayfirst.cx/vaultwarden
+    vaultwarden_database_name: vaultboy
+    vaultwarden_database_password: fallout2
+    vaultwarden_domain: vaultwarden.example.com
   roles:
     - hax0rbana-adam.vaultwarden
 ```

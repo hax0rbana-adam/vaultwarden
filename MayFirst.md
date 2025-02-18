@@ -44,6 +44,7 @@ At a minimum,  and the following variables:
 - vaultwarden_smtp_password
 - vaultwarden_database_username
 - vaultwarden_database_password
+- vaultwarden_domain
 
 These are typically stored in [host vars](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html) and protected with [ansible vault](https://docs.ansible.com/ansible/latest/cli/ansible-vault.html).
 
