@@ -5,6 +5,10 @@ you do not have root access. This means the playbook will not install any
 system software, nor create any databases (these may be optional features in
 the future).
 
+If you are deploying this on [MayFirst](https://mayfirst.coop)'s shared
+hosting, see [MayFirst.md](MayFirst.md) for specific instructions on how to
+set up the web configuration, database and server access.
+
 # Post installation
 
 There are some additional steps to set this up on a shared server after
@@ -15,6 +19,10 @@ configuring the webapp.
 After applying this role this on a shared server, you will need to configure
 your web server to proxy requests to Vaultwarden and create a service to run it
 (both of which will be done differently depending on your hosting provider).
+
+If you are deploying this on [MayFirst](https://mayfirst.coop)'s shared
+hosting and used [MayFirst.md](MayFirst.md) as a guide, you've already set up
+the port forwarding in the Web Configuration section.
 
 ## All cases
 After that, you can log into /admin and invite users to sign up from the Users
@@ -40,30 +48,6 @@ Here's an example playbook to set up Vaultwarden on a shared server.
     vaultwarden_database_url: postgresql://vaultwarden:hunter2@psql002.mayfirst.cx/vaultwarden
   roles:
     - hax0rbana-adam.vaultwarden
-```
-
-There are also some options required in your `ansible.cfg` file:
-
-```ini
-[defaults]
-# Found via the error message if you don't have this in here
-remote_tmp=$HOME/.ansible/tmp
-
-# Use pipelining to work around this bug:
-# https://github.com/ansible/ansible/issues/57542
-# found via this forum post
-# https://forum.ansible.com/t/ansible-2-9-failed-to-transfer-ansiballz-setup-py-when-gathering-facts/34253
-pipelining=True
-
-# Use stdout_callback of "debug" to avoid escaped quotes in debug messages
-# found via https://stackoverflow.com/a/54943100
-stdout_callback=debug
-
-[ssh_connection]
-# Found via the warning messages if you don't have this in here
-# Use SCP only (as opposed to using SFTP)
-transfer_method=scp
-scp_if_ssh = true
 ```
 
 And then running the playbook will look something like this:
