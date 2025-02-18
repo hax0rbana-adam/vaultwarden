@@ -47,7 +47,7 @@ Here's an example playbook to set up Vaultwarden on a shared server.
     vaultwarden_smtp_password: hunter2
     vaultwarden_database_name: vaultboy
     vaultwarden_database_password: fallout2
-    vaultwarden_domain: vaultwarden.example.com
+    vaultwarden_domain: https://vaultwarden.example.com
   roles:
     - hax0rbana-adam.vaultwarden
 ```
