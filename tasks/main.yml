@@ -51,6 +51,7 @@
       sed -e "s/\(.*\)'\(.*\)'/'\1\2'/g" -e 's/\(.*\)"\(.*\)"/"\1\2"/g' < .config/vaultwarden.env | awk '{ printf "%s ", $0 }'
   register: env_var_string
   when: vaultwarden_shared_server
+  changed_when: false
 
 # https://help.mayfirst.org/en/guide/how-to-use-a-systemd-service-to-run-web-app
 - name: Printing out the environment variables to enter into MayFirst's scheduled job
