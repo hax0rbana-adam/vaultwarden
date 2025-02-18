@@ -18,9 +18,9 @@
 - name: Downloading binary release file from github
   ansible.builtin.unarchive:
     src: https://github.com/czyt/vaultwarden-binary/releases/download/{{vaultwarden_version}}-extracted/vaultwarden-linux-{{vaultwarden_arch}}-extracted.zip
-    dest: "{{ 'files' if vaultwarden_shared_server else '/usr/local/vaultwarden'}}"
+    dest: "{{ 'files/vaultwarden' if vaultwarden_shared_server else '/usr/local/vaultwarden'}}"
     remote_src: true
-    creates: "{{ 'files/vaultwarden' if vaultwarden_shared_server else '/usr/local/vaultwarden/vaultwarden'}}"
+    creates: "{{ 'files/vaultwarden/vaultwarden' if vaultwarden_shared_server else '/usr/local/vaultwarden/vaultwarden'}}"
 
 - name: Configuring vaultwarden's environment variables
   ansible.builtin.template:
@@ -55,5 +55,9 @@
 # https://help.mayfirst.org/en/guide/how-to-use-a-systemd-service-to-run-web-app
 - name: Printing out the environment variables to enter into MayFirst's scheduled job
   ansible.builtin.debug:
-    msg: "{{env_var_string.stdout}}"
+    msg: |
+      Command: {{ansible_env['HOME']}}/files/vaultwarden/vaultwarden
+      Schedule: forever
+      Directory: {{ansible_env['HOME']}}/files/vaultwarden
+      Environment: {{env_var_string.stdout}}
   when: vaultwarden_shared_server
