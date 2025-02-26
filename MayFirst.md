@@ -31,7 +31,7 @@ Add a database which you can name whatever you want. Record the username and pas
 
 ## Playbook
 You can start with the example playbook for a shared server in the main
-[README](README.md) file.
+[README](README.md#shared-server-1) file.
 
 You will need to change the `remote_user` in the playbook to match your username (from the Server Access section).
 
@@ -46,7 +46,7 @@ At a minimum,  and the following variables:
 - vaultwarden_database_password
 - vaultwarden_domain
 
-These are typically stored in [host vars](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html) and protected with [ansible vault](https://docs.ansible.com/ansible/latest/cli/ansible-vault.html).
+These are typically stored in [host vars](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html) and protected with [ansible vault](https://docs.ansible.com/ansible/latest/cli/ansible-vault.html), however since all hosts for MayFirst have to be `shell.mayfirst.org`, you will need to create [group vars](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html) and use a different group for each host. This will allow specifying the `ansible_ssh_user` under the `shell.mayfirst.org` host.
 
 ## ansible.cfg
 In the same directory as your playbook, you will also need an ansible.cfg with some specific settings required to be compatible with MayFirst's environment. The easiest way to get these settings is to just copy and paste the block below into your ansible.cfg file.
