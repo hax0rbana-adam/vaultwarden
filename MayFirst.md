@@ -81,3 +81,21 @@ At the end of execution of the playbook, it will print out: a comand, a director
 After the scheduled job is active, you should be able to go to /admin on your vaultwarden instance. If this is not the case, you'll want to SSH into your instance and run `systemctl --user status red-item-366487.service` substituting your Scheduled job ID for 366487.
 
 If it can't start because there is already something listening on the port you're trying to use, you will need to change the `vaultwarden_rocket_port` variable and update your Web Configuations settings to match the new port.
+
+# Troubleshooting
+
+If your scheduled job fails to start, check `journalctl --user red-item-366487` to see the logs with the full error message.
+
+## DatabaseError
+
+If you see: `thread 'main' panicked at 'Error running migrations: DatabaseError(Unknown, "permission denied for schema public")'`
+
+It means there was a database permission error. This is usually because `vaultwarden_database_name` wasn't specified and it is needed on this server (e.g. in the case of a shared server).
+
+To verify your database is working as expected, try to connect to the database from the command line. On MayFirst's servers, it might look like this:
+
+`psql -U my_db_username -h psql002.mayfirst.cx my_db_vaultwarden`
+
+That should drop you into a PostgreSQL prompt. Running `\l` should show you a list of dabases and yours should be in that list. If so, you can run `quit` at the psql prompt.
+
+Check the Environment variables in your Scheduled Job in the MayFirst Control Panel. It will have a DATABASE_URL there. Verify the username, password, and database name are correct. If they aren't, the best way to fix it is to add the missing ansible variable and then run the playbook again. That way you know that it won't require any manual intervention in the even you ever have to re-deploy.
