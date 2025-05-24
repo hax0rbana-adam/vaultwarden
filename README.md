@@ -141,10 +141,10 @@ Here's a sample playbook for a standalone server:
                           value: '$http_host'
                         - field: X-Real-IP
                           value: '$remote_addr'
-                        - field: X-WEBAUTH-USER
-                          value: '$remote_user'
-                        - field: Authorization
-                          value: '""'
+                        - field: Upgrade
+                          value: '$http_upgrade'
+                        - field: Connection
+                          value: 'Upgrade'
 ```
 
 In a situation which isn't a demo, your variables would be defined in something
