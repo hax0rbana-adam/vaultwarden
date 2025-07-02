@@ -4,13 +4,13 @@
 # takes the argon2id hash, which can be generated with something like:
 # https://argon2.online/
 
-#vaultwarden_admin_hash: "$argon2id$v=19$m=65540,t=3,p=4$hpiewbOU3H/iY6WvPoQJCvx9CY7DFmXvUWm9T9b3Z3k$tUhBc7/ucfquUJtUy43iXvceqZtdASGqPHNDEbHkflQ"
+# vaultwarden_admin_hash: "$argon2id$v=19$m=65540,t=3,p=4$hpiewbOU3H/iY6WvPoQJCvx9CY7DFmXvUWm9T9b3Z3k$tUhBc7/ucfquUJtUy43iXvceqZtdASGqPHNDEbHkflQ"
 
-#vaultwarden_smtp_username:
-#vaultwarden_smtp_password:
+# vaultwarden_smtp_username:
+# vaultwarden_smtp_password:
 
 vaultwarden_database_username: vaultwarden
-#vaultwarden_database_password: 
+# vaultwarden_database_password:
 vaultwarden_database_name: vaultwarden
 vaultwarden_database_server: psql002.mayfirst.cx
 
@@ -22,13 +22,17 @@ vaultwarden_websocket_enabled: true
 vaultwarden_rocket_address: 127.0.0.1
 vaultwarden_rocket_port: 8000
 vaultwarden_websocket_address: 127.0.0.1
-vaultwarden_domain: "https://{{ansible_fqdn}}"
-vaultwarden_smtp_from: NOREPLY@{{ansible_domain}}
+vaultwarden_domain: "https://{{ ansible_fqdn }}"
+vaultwarden_smtp_from: NOREPLY@{{ ansible_domain }}
 vaultwarden_smtp_host: mail.mayfirst.org
 vaultwarden_smtp_port: 465
 vaultwarden_smtp_security: force_tls
-vaultwarden_smtp_from_name: Vaultwarden {{ansible_fqdn}}
-vaultwarden_database_url: postgresql://{{vaultwarden_database_username}}:{{vaultwarden_database_password}}@{{vaultwarden_database_server}}/{{vaultwarden_database_name}}
+vaultwarden_smtp_from_name: Vaultwarden {{ ansible_fqdn }}
+vaultwarden_database_url: >
+  postgresql://{{ vaultwarden_database_username }}
+  :{{ vaultwarden_database_password }}
+  @{{ vaultwarden_database_server }}
+  /{{ vaultwarden_database_name }}
 vaultwarden_env_extras:
   ORG_EVENTS_ENABLED: false
 

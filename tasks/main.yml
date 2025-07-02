@@ -5,33 +5,34 @@
 
 - name: Make sure we have a directory to store Vaultwarden's data
   ansible.builtin.file:
-    path: "{{ 'files/vaultwarden/data' if vaultwarden_shared_server else '/usr/local/vaultwarden/data'}}"
+    path: "{{ 'files/vaultwarden/data' if vaultwarden_shared_server else '/usr/local/vaultwarden/data' }}"
     state: directory
     mode: '700'
 
 - name: Make sure we have a directory to store Vaultwarden's environment variables
   ansible.builtin.file:
-    path: "{{ '.config' if vaultwarden_shared_server else '/etc/vaultwarden'}}"
+    path: "{{ '.config' if vaultwarden_shared_server else '/etc/vaultwarden' }}"
     state: directory
     mode: '700'
 
 - name: Downloading binary release file from github
   ansible.builtin.unarchive:
-    src: https://github.com/czyt/vaultwarden-binary/releases/download/{{vaultwarden_version}}-extracted/vaultwarden-linux-{{vaultwarden_arch}}-extracted.zip
-    dest: "{{ 'files/vaultwarden' if vaultwarden_shared_server else '/usr/local/vaultwarden'}}"
+    src: https://github.com/czyt/vaultwarden-binary/releases/download/{{ vaultwarden_version }}-extracted/vaultwarden-linux-{{ vaultwarden_arch }}-extracted.zip
+    dest: "{{ 'files/vaultwarden' if vaultwarden_shared_server else '/usr/local/vaultwarden' }}"
     remote_src: true
-    creates: "{{ 'files/vaultwarden/vaultwarden' if vaultwarden_shared_server else '/usr/local/vaultwarden/vaultwarden'}}"
+    creates: "{{ 'files/vaultwarden/vaultwarden' if vaultwarden_shared_server else '/usr/local/vaultwarden/vaultwarden' }}"
 
 - name: Configuring vaultwarden's environment variables
   ansible.builtin.template:
     src: templates/vaultwarden.env.j2
-    dest: "{{ '.config/vaultwarden.env' if vaultwarden_shared_server else '/etc/vaultwarden/vaultwarden.env'}}"
+    dest: "{{ '.config/vaultwarden.env' if vaultwarden_shared_server else '/etc/vaultwarden/vaultwarden.env' }}"
     mode: '600'
 
 - name: Adding systemd service to run vaultwarden if on a dedicated server
   ansible.builtin.template:
     src: templates/vaultwarden.service.j2
     dest: /etc/systemd/system/vaultwarden.service
+    mode: '644'
   when: not vaultwarden_shared_server
 
 - name: Activate systemd service if on a dedicated server
@@ -45,7 +46,9 @@
 # MayFirst requires environment variables to be quoted in a non-standard way so
 # we print out the string in the format they require so it can be easily copied
 # and pasted into their control panel.
-- name: Generating the string of environment variables that will be entered into MayFirst's scheduled job
+- name: Generating the string of environment variables that will be entered into MayFirst's scheduled job # noqa: command-instead-of-module
+  # The noqa is because we can't use a template, replace or lineinfile here on account
+  # of us not modifying contents of a file, but rather what's printed on stdout.
   ansible.builtin.shell:
     cmd: |
       sed -e "s/\(.*\)'\(.*\)'/'\1\2'/g" -e 's/\(.*\)"\(.*\)"/"\1\2"/g' < .config/vaultwarden.env | awk '{ printf "%s ", $0 }'
@@ -57,8 +60,8 @@
 - name: Printing out the environment variables to enter into MayFirst's scheduled job
   ansible.builtin.debug:
     msg: |
-      Command: {{ansible_env['HOME']}}/files/vaultwarden/vaultwarden
+      Command: {{ ansible_env['HOME'] }}/files/vaultwarden/vaultwarden
       Schedule: forever
-      Directory: {{ansible_env['HOME']}}/files/vaultwarden
-      Environment: {{env_var_string.stdout}}
+      Directory: {{ ansible_env['HOME'] }}/files/vaultwarden
+      Environment: {{ env_var_string.stdout }}
   when: vaultwarden_shared_server
