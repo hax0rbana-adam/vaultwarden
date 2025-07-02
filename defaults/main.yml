@@ -28,11 +28,9 @@ vaultwarden_smtp_host: mail.mayfirst.org
 vaultwarden_smtp_port: 465
 vaultwarden_smtp_security: force_tls
 vaultwarden_smtp_from_name: Vaultwarden {{ ansible_fqdn }}
-vaultwarden_database_url: >
-  postgresql://{{ vaultwarden_database_username }}
-  :{{ vaultwarden_database_password }}
-  @{{ vaultwarden_database_server }}
-  /{{ vaultwarden_database_name }}
+# yamllint disable rule:line-length
+vaultwarden_database_url: postgresql://{{ vaultwarden_database_username }}:{{ vaultwarden_database_password }}@{{ vaultwarden_database_server }}/{{ vaultwarden_database_name }}
+# yamllint enable rule:line-length
 vaultwarden_env_extras:
   ORG_EVENTS_ENABLED: false
 
