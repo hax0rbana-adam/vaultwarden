@@ -29,10 +29,12 @@ vaultwarden_smtp_port: 465
 vaultwarden_smtp_security: force_tls
 vaultwarden_smtp_from_name: Vaultwarden {{ansible_fqdn}}
 vaultwarden_database_url: postgresql://{{vaultwarden_database_username}}:{{vaultwarden_database_password}}@{{vaultwarden_database_server}}/{{vaultwarden_database_name}}
+vaultwarden_env_extras:
+  ORG_EVENTS_ENABLED: false
 
 # Check for the latest binary release here:
 # https://github.com/czyt/vaultwarden-binary/releases
 # The main repo (https://github.com/dani-garcia/vaultwarden) doesn't release
 # binaries, only source code, which is why we turn to czyt.
-vaultwarden_version: 1.33.2
+vaultwarden_version: 1.34.1
 vaultwarden_arch: amd64
