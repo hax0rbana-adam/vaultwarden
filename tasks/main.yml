@@ -20,7 +20,6 @@
     src: https://github.com/czyt/vaultwarden-binary/releases/download/{{ vaultwarden_version }}-extracted/vaultwarden-linux-{{ vaultwarden_arch }}-extracted.zip
     dest: "{{ 'files/vaultwarden' if vaultwarden_shared_server else '/usr/local/vaultwarden' }}"
     remote_src: true
-    creates: "{{ 'files/vaultwarden/vaultwarden' if vaultwarden_shared_server else '/usr/local/vaultwarden/vaultwarden' }}"
 
 - name: Configuring vaultwarden's environment variables
   ansible.builtin.template:
