@@ -4,6 +4,10 @@ These are instructions on how to use this role with MayFirst's shared hosting.
 
 There are a number of things to set up in the control panel before applying this role.
 
+## Mailbox
+
+You will need an SMTP username and password in order for Vaultwarden to send out notifications such as email inviations, password resets and the like. Adding a mailbox will allow you to use your MayFirst account to send those messages.
+
 ## Web Configuration
 Create a Web Configuration for this service.
 
@@ -30,23 +34,47 @@ Add a database which you can name whatever you want. Record the username and pas
 # Ansible
 
 ## Playbook
-You can start with the example playbook for a shared server in the main
-[README](README.md#shared-server-1) file.
+You can start with the example playbook below if deploying to MayFirst's shared server:
+
+```
+# vaultwarden.yml
+- hosts: vaultwarden
+  remote_user: enterYourMFUsernameHere
+  roles:
+    - hax0rbana-adam.vaultwarden
+```
 
 You will need to change the `remote_user` in the playbook to match your username (from the Server Access section).
 
+You will also need the vaultwarden role, which you can get from Ansible galaxy like so:
+
+```sh
+ansible-galaxy role install hax0rbana-adam.vaultwarden
+```
+
 ## Variables
 
-At a minimum,  and the following variables:
+At a minimum you will need the following variables:
 
 - vaultwarden_admin_hash
 - vaultwarden_smtp_username
 - vaultwarden_smtp_password
 - vaultwarden_database_username
 - vaultwarden_database_password
+- vaultwarden_database_name
 - vaultwarden_domain
 
-These are typically stored in [host vars](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html) and protected with [ansible vault](https://docs.ansible.com/ansible/latest/cli/ansible-vault.html), however since all hosts for MayFirst have to be `shell.mayfirst.org`, you will need to create [group vars](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html) and use a different group for each host. This will allow specifying the `ansible_ssh_user` under the `shell.mayfirst.org` host.
+The vaultwarden_admin_hash will need to be generated online. See defaults/main.yml for more info on this and the other variables.
+
+These would typically stored in [host vars](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html) and protected with [ansible vault](https://docs.ansible.com/ansible/latest/cli/ansible-vault.html), however since all hosts for MayFirst have to be `shell.mayfirst.org`, it's easiest to create [group vars](https://docs.ansible.com/ansible/latest/playbook_guide/playbooks_variables.html) and use a different group for each deployment (e.g. your test and production instances). For example:
+
+```sh
+mkdir -p group_vars/vaultwarden
+ansible-vault create group_vars/vaultwarden/encrypted.yml
+# fill in variables, then save and exit
+```
+
+This will allow specifying the `ansible_ssh_user` under the `shell.mayfirst.org` host.
 
 ## ansible.cfg
 In the same directory as your playbook, you will also need an ansible.cfg with some specific settings required to be compatible with MayFirst's environment. The easiest way to get these settings is to just copy and paste the block below into your ansible.cfg file.
@@ -69,11 +97,25 @@ stdout_callback=debug
 [ssh_connection]
 # Found via the warning messages if you don't have this in here
 # Use SCP only (as opposed to using SFTP)
-transfer_method=scp
+#transfer_method=scp
+```
+
+Finally, you'll need an inventory file which looks something like this:
+
+```
+# inventory.yml
+all:
+  children:
+    vaultwarden:
+      hosts:
+        shell.mayfirst.org:
 ```
 
 # Running the playbook
-Follow the instructions in the main [README](README.md) to run the playbook.
+
+```sh
+ansible-playbook -i inventory.yml --ask-vault-password vaultwarden.yml
+```
 
 # Scheduled job
 At the end of execution of the playbook, it will print out: a comand, a directory and string of environment variables to enter into your scheduled job. In the MayFirst control panel, go to Scheduled job and fill these values in.
@@ -84,7 +126,7 @@ If it can't start because there is already something listening on the port you'r
 
 # Troubleshooting
 
-If your scheduled job fails to start, check `journalctl --user red-item-366487` to see the logs with the full error message.
+If your scheduled job fails to start, check `journalctl --user red-item-366487` to see the logs with the full error message (assuming that 366487 is the scheduled job ID shows in the MayFirst control panel).
 
 ## DatabaseError
 
